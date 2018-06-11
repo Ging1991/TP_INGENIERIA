@@ -1,0 +1,6 @@
+{"id":1,"estado_id":0,"ubicacion":{"lat":-34.5460985,"lon":-58.7104065}},
+{"id":2,"estado_id":0,"ubicacion":{"lat":-34.541765,"lon":-58.7160749}},
+{"id":3,"estado_id":1,"ubicacion":{"lat":-34.5460985,"lon":-58.7104065}},
+{"id":4,"estado_id":1,"ubicacion":{"lat":-34.541765,"lon":-58.7160749}},
+{"id":5,"estado_id":1,"ubicacion":{"lat":-34.541765,"lon":-58.7160749}},
+{"id":6,"estado_id":2,"ubicacion":{"lat":-34.541765,"lon":-58.7160749}}
