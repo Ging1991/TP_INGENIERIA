@@ -1,0 +1,64 @@
+
+*{
+	border:  0;
+	margin:  0;
+	padding: 0;
+}
+
+body {
+	background: chartreuse;
+    display: flex;
+    flex-direction: column;
+	height: 100%;
+	width: 100%;
+	margin-right: auto;
+	margin-left: auto;
+}
+
+
+header{
+	display: flex;
+	
+}
+
+div#menu {
+	display: flex;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    background-color: #3eec69;
+}
+
+li.menu_item{
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+	transition: background 1s;
+}
+
+li.menu_item:hover {
+    background-color: rgb(0, 119, 64);
+    cursor: pointer;
+}
+
+div#contenido{
+	display: flex;
+	
+	background: #c6cde0;
+	list-style-type: none;
+	flex-grow: 1;
+	overflow: auto;
+	text-align: center;
+	
+}
+
+footer{
+	text-align: center;
+	background: #666;
+}
+
+div#pie_pagina{
+	padding: 8px 8px;
+}

@@ -1,0 +1,25 @@
+<html>
+
+<head>
+
+	<!-- Realizacion de importaciones necesarias-->
+	<link rel="stylesheet" type="text/css" href="./css/infracciones.css"></link>
+	<script src="./js/infracciones.js"></script>
+</head>
+
+<body>
+	<div id="contenedor_infracciones">
+		<form id='ingreso_patente' onsubmit='submitPatente()' method='post'>
+			<label>Patente</label>
+			<input id="patente" type="text" placeholder="Ingrese la patente " required="false" maxlength="6"
+			pattern="([A-Z]{3})(\d{3})" title="AAA123"></input>
+			<input type="submit" value="Enviar"></input>
+
+		</form>
+	
+
+	<script>$(onSubmitPatente());</script>
+	</div>
+</body>
+
+</html>
