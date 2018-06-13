@@ -6,9 +6,8 @@ var Dibujador = function() {
     }
 
     function dibujarGrua(grua, mapa) {
-		//var dato = grua.estado.descripcion;
-    	var dato = grua.estado;
-		var punto = L.marker(L.latLng(grua.ubicacion.lat, grua.ubicacion.lon))
+    	var dato = grua.getEstado();
+		var punto = L.marker(L.latLng(grua.getLat(), grua.getLon()))
 			.bindPopup(dato);
 		punto.addTo(mapa);		
 	}

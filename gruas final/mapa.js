@@ -15,4 +15,10 @@ var crearMapa = function(nodoID) {
     mapa.controlCapas = controlCapas;
 
     return mapa;
-}
+};
+
+var limpiarMapa = function (mapa) {
+	mapa.eachLayer(function (layer) {
+	    mapa.removeLayer(layer);
+	});
+};
