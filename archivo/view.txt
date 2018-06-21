@@ -1,0 +1,515 @@
+
+function bootstrap() {
+
+    var casaIcon = L.icon({
+                    iconUrl: 'casa.png',
+                    iconSize:     [40, 40], // size of the icon
+                });
+
+    var choqueIcon = L.icon({
+                    iconUrl: 'choque.png',
+                    iconSize:     [40, 40], // size of the icon
+                });
+
+    var congestionIcon = L.icon({
+                    iconUrl: 'congetion.png',
+                    iconSize:     [40, 40], // size of the icon
+                });
+
+    var manifestationIcon = L.icon({
+                    iconUrl: 'protest.png',
+                    iconSize:     [40, 40], // size of the icon
+                });
+ 
+
+    //Pedidos Persistidos
+    var Requests = new Array
+
+    //Pedidos Persistidos
+    var Drivers = new Array
+
+    //Posiciones Persistidas
+    var Positions = new Array
+
+    //Incidencias Persistidos
+    var Incidents = new Array
+
+    //IncidenciasType Persistidos
+    var IncidentsType = new Array
+
+    var showCars;
+
+//---------------------------------------------------------------------------------------------------------------
+
+    function Pedido(Id, Destino, ChoferesDisponibles) {
+        this.Id = Id;
+        this.Destino = Destino;
+        this.ChoferesDisponibles = ChoferesDisponibles;
+    }
+  
+    function Conductor(Id, Nombre, Puntaje, IdAuto, Descripcion, Color, Patente, Anio) {
+        this.Id = Id;
+        this.Nombre = Nombre;
+        this.Puntaje = Puntaje;
+        this.IdAuto = IdAuto;
+        this.Descripcion = Descripcion;
+        this.Color = Color;
+        this.Patente = Patente;
+        this.Anio = Anio;
+    }
+
+    function Posicion(IdDriver, Recorrido) {
+        this.IdDriver = IdDriver;
+        this.Recorrido = Recorrido;
+    }
+
+    function Incidencia(Id, Coordenada, Tipo) {
+        this.Id = Id;
+        this.Coordenada = Coordenada;
+        this.Tipo = Tipo;
+    }
+
+    function TipoIncidencia(Id, Descripcion, Delay) {
+        this.Id = Id;
+        this.Descripcion = Descripcion;
+        this.Delay = Delay;
+    }    
+
+//---------------------------------------------------------------------------------------------------------------
+
+    // Ubicación de la UNGS.
+    var HomeLocation = [-34.5221554, -58.7000067];
+
+    // Creación del componente mapa de Leaflet.
+    var map = L.map('map').setView(HomeLocation, 15);
+
+    // Agregamos los Layers de OpenStreetMap.
+    var baseLayer = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    // Agregamos el control para seleccionar Layers al mapa
+    var layersControl = L.control.layers({
+        "Base": baseLayer
+    });
+    layersControl.addTo(map);
+    // hack:
+    map.layersControl = layersControl;
+
+    // Creamos un pedido de viaje
+    var travelreq = new TravelRequest("UNGS", map);
+
+    TraerPedidos();
+    TraerChoferes();
+    TraerPositions();
+    TraerIncidencias();
+    TraerTiposIncidencias();
+
+
+    // Eventos Button!!!!
+    //---------------------------------------------------------
+
+    var boton = document.getElementById("VerChoferesPedido");
+    boton.addEventListener("click", function(){
+        // Creamos un marker sobre la UNGS.
+        var HomeMarker = L.marker(HomeLocation,{icon: casaIcon});
+        HomeMarker.addTo(map);
+        var DestinoIngresado = document.getElementsByName("destino")[0].value;
+        var IDIngresado = "";
+        if(DestinoIngresado=="UNGS"){
+          IDIngresado=42;
+        }
+        if(DestinoIngresado=="Universidad Sarmiento"){
+          IDIngresado=80;
+        } 
+        var available = [];
+        for(var i=0; i< Requests.length;i++){
+          if(Requests[i].Id==IDIngresado){
+            available = Requests[i].ChoferesDisponibles;
+            MostrarAutos(available);
+            MostrarTabla(available);
+          }
+        }
+    }, false);
+
+    var boton2 = document.getElementById("elegir");
+    boton2.addEventListener("click", function(){
+        var ChofElegido = document.getElementsByName("ChofEleg")[0].value;
+        var DestinoIngresado = document.getElementsByName("destino")[0].value;
+        var IdPedidoElegido = "";
+        if(DestinoIngresado=="UNGS"){
+          IdPedidoElegido=42;
+        }
+        if(DestinoIngresado=="Universidad Sarmiento"){
+          IdPedidoElegido=80;
+        } 
+        for (var indice = 0; indice < Requests.length; indice++) {
+          if(Requests[indice].Id==IdPedidoElegido){
+            for(var Index = 0; Index < Requests[indice].ChoferesDisponibles.length; Index++){
+              if(Requests[indice].ChoferesDisponibles[Index]==ChofElegido){
+                map.removeLayer(showCars);
+                SeleccionDeChofer(ChofElegido);
+              }
+            } 
+          }
+        }
+    }, false);
+
+    //--------------------------------------------------------------------------------------------------------
+    // Functions
+    //--------------------------------------------------------------------------------------------------------
+    
+    function TraerPedidos() {
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            PersistirPedidos(this.responseText);
+        }
+      };
+      xhttp.open("GET", "http://snapcar.herokuapp.com/api/requests/", true);
+      xhttp.send();
+    }
+
+    function PersistirPedidos(cadena){
+        var Pedidos = JSON.parse(cadena);
+        for(var i=0; i< Pedidos.requests.length;i++){
+          var A = Pedidos.requests[i].id;
+          var B = Pedidos.requests[i].coordinate;
+          var C = Pedidos.requests[i].availableDrivers;
+          var request = new Pedido(A, B, C);
+          Requests.push(request);
+        }        
+    }
+
+    //--------------------------------------------------------------------------------------------------------
+    //--------------------------------------------------------------------------------------------------------
+
+    function TraerChoferes() {
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          PersistirChoferes(this.responseText);
+        }
+      };
+      xhttp.open("GET", "http://snapcar.herokuapp.com/api/drivers/", true);
+      xhttp.send();
+    }
+
+    function PersistirChoferes(Cadena){
+      var Choferes = JSON.parse(Cadena);
+      for(var i=0; i< Choferes.drivers.length;i++){
+        var A = Choferes.drivers[i].id;
+        var B = Choferes.drivers[i].name;
+        var C = Choferes.drivers[i].score;
+        var D = Choferes.drivers[i].car.id;
+        var E = Choferes.drivers[i].car.description;
+        var F = Choferes.drivers[i].car.color;
+        var G = Choferes.drivers[i].car.plateNumber;
+        var H = Choferes.drivers[i].car.year; 
+        var driver = new Conductor(A, B, C, D, E, F, G, H);
+        Drivers.push(driver);
+      }
+    }
+
+    //-------------------------------------------------------------------------------------------------------- 
+    //--------------------------------------------------------------------------------------------------------
+
+    function TraerPositions() {
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            PersistirPositions(this.responseText);
+        }
+      };
+      xhttp.open("GET", "http://snapcar.herokuapp.com/api/positions/", true);
+      xhttp.send();
+    }
+
+    function PersistirPositions(cadena){
+        var Posiciones = JSON.parse(cadena);
+        for(var i = 0; i < Posiciones.positions.length; i++ ){
+          var A = Posiciones.positions[i].driver;
+          var B = Posiciones.positions[i].positions;
+          var PosicionEle = new Posicion(A, B);
+          Positions.push(PosicionEle);
+        }           
+      }
+    
+    //-------------------------------------------------------------------------------------------------------- 
+    //--------------------------------------------------------------------------------------------------------
+    
+    function TraerIncidencias() {
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            PersistirIncidencias(this.responseText);
+        }
+      };
+      xhttp.open("GET", "http://snapcar.herokuapp.com/api/incidents/", true);
+      xhttp.send();
+    }
+
+    function PersistirIncidencias(cadena){
+        var Incidencias = JSON.parse(cadena);
+        for(var i=0; i< Incidencias.incidents.length;i++){
+            var A = Incidencias.incidents[i].id;
+            var B = Incidencias.incidents[i].coordinate;
+            var C = Incidencias.incidents[i].type;
+          var Inci = new Incidencia(A, B, C);
+          Incidents.push(Inci);
+        }
+        MostrarIncidencias();
+    }
+
+    //-------------------------------------------------------------------------------------------------------- 
+    //--------------------------------------------------------------------------------------------------------
+    
+    function TraerTiposIncidencias() {
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            PersistirTiposIncidencias(this.responseText);
+        }
+      };
+      xhttp.open("GET", "http://snapcar.herokuapp.com/api/incidentstypes/", true);
+      xhttp.send();
+    }
+
+    function PersistirTiposIncidencias(cadena){
+      var TiposIncidencias = JSON.parse(cadena);
+      for(var i=0; i< TiposIncidencias.incidenttypes.length;i++){
+          var A = TiposIncidencias.incidenttypes[i].id;
+          var B = TiposIncidencias.incidenttypes[i].description;
+          var C = TiposIncidencias.incidenttypes[i].delay;        
+          var TipoInciden = new TipoIncidencia(A, B, C);
+          IncidentsType.push(TipoInciden);
+      }
+    }
+
+
+    //-------------------------------------------------------------------------------------------------------- 
+    //--------------------------------------------------------------------------------------------------------
+
+    function MostrarIncidencias(){
+
+      for (var i = 0; i < Incidents.length; i++) {
+        var Type = Incidents[i].Tipo;
+        var Posicion = Incidents[i].Coordenada;
+
+        switch(Type){
+            case 1:
+                var a = L.marker(Posicion, {icon: choqueIcon});
+                    a.bindPopup("Choque");
+                    a.on('mouseover',function (e){
+                        this.openPopup();
+                        });
+                    a.on('mouseout',function (e){
+                        this.closePopup();
+                    });
+                    a.addTo(map);
+            break;
+            case 2:
+                var a = L.marker(Posicion, {icon: manifestationIcon});
+                a.bindPopup("Manifestacion");
+                a.on('mouseover',function (e){
+                    this.openPopup();
+                });
+                a.on('mouseout',function (e){
+                    this.closePopup();
+                });
+                a.addTo(map);
+            break;
+            case 3:
+                var a = L.marker(Posicion, {icon: congestionIcon});
+                a.bindPopup("Embotellamiento");
+                a.on('mouseover',function (e){
+                    this.openPopup();
+                    });
+                a.on('mouseout',function (e){
+                    this.closePopup();
+                });
+                a.addTo(map);
+            break;
+        }
+      }
+    }
+
+    //-------------------------------------------------------------------------------------------------------- 
+    //--------------------------------------------------------------------------------------------------------
+    
+    function SeleccionDeChofer (CHOFSelect){
+        for(var i = 0; i < Positions.length; i++ ){
+          if(Positions[i].IdDriver==CHOFSelect){
+            var carSelected = new CarDriver(CHOFSelect,Positions[i].Recorrido);   
+              travelreq.addCar(carSelected);    
+              //conseguir las posiciones originales Posiciones.positions[i].positions[0].lat + "  " + Posiciones.positions[i].positions[0].lon
+              document.getElementById("EstadoViaje").innerHTML = "Aguarde a Chofer, Por Favor :)";
+              break;    
+          }
+          if(i==Positions.length-1 && CHOFSelect != Positions.length.IdDriver){
+            document.getElementById("EstadoViaje").innerHTML = "El Chofer ingresado no existe!!";   
+          }
+        }   
+        travelreq.start();
+    }
+
+    //-------------------------------------------------------------------------------------------------------- 
+    //--------------------------------------------------------------------------------------------------------
+
+    function MostrarTabla(disponibles){
+
+          // var body = document.getElementsByTagName("body")[0];
+          document.getElementById("SalidaTabla").innerHTML = "";
+          var body = document.getElementById("SalidaTabla");
+          var tabla   = document.createElement("table");
+          var tblBody = document.createElement("tbody");
+
+          // Crea las celdas
+          for (var e = -1; e < disponibles.length; e++) {
+            // Crea las fila de la tabla
+
+            var Idchofer = "";
+            
+            for (var M = 0; M < Drivers.length; M++) {
+              if(Drivers[M].Id==disponibles[e]){   
+                Idchofer = M;
+              }
+            }
+
+
+            var fila = document.createElement("tr");
+            
+            for (var j = 0; j < 6; j++) {
+
+                
+              if (e==-1){
+                var celda = document.createElement("th");
+                if(j==0){
+                  var textoCelda = document.createTextNode("Id");
+                }
+                if(j==1){
+                   var textoCelda = document.createTextNode("Chofer");
+                }
+               if(j==2){
+                   var textoCelda = document.createTextNode("Puntaje");
+                }
+                if(j==3){
+                   var textoCelda = document.createTextNode("Auto");
+                }
+               if(j==4){
+                   var textoCelda = document.createTextNode("Color");
+                }
+                if(j==5){
+                   var textoCelda = document.createTextNode("Modelo");
+                }
+                celda.appendChild(textoCelda);
+                fila.appendChild(celda);
+              }
+              else{
+
+                var celda = document.createElement("td");
+                if(j==0){
+                  var textoCelda = document.createTextNode(Drivers[Idchofer].Id);
+                }
+                if(j==1){
+                   var textoCelda = document.createTextNode(Drivers[Idchofer].Nombre);
+                }
+               if(j==2){
+                   var textoCelda = document.createTextNode(Drivers[Idchofer].Puntaje + " *");
+                }
+                if(j==3){
+                   var textoCelda = document.createTextNode(Drivers[Idchofer].Descripcion);
+                }
+                if(j==4){
+                   var textoCelda = document.createTextNode(Drivers[Idchofer].Color);
+                }
+                if(j==5){
+                   var textoCelda = document.createTextNode(Drivers[Idchofer].Anio);
+                }
+                  
+                celda.appendChild(textoCelda);
+                fila.appendChild(celda);
+              }
+            }
+            // agrega la fila al final de la tabla (al final del elemento tblbody)
+            tblBody.appendChild(fila);
+          }
+         
+          // posiciona el <tbody> debajo del elemento <table>
+          tabla.appendChild(tblBody);
+          // appends <table> into <body>
+          body.appendChild(tabla);
+          // modifica el atributo "border" de la tabla y lo fija a "2";
+          tabla.setAttribute("border", "10");
+          tabla.style.backgroundColor = "Red";
+      }
+    
+    //--------------------------------------------------------------------------------------------------------
+    //--------------------------------------------------------------------------------------------------------
+
+    // HacerAutos(arrPos, conductores, disponibles);
+
+
+    function MostrarAutos(disponibles){
+      var Markers = new Array;
+      var CoordenadaInicial="";
+      var NombreChofer="";
+      var PuntajeChofer="";
+      var ColorAuto="";
+
+      for (var i = 0; i < Drivers.length; i++) {
+        for (var j = 0; j < disponibles.length; j++) {
+          if(Drivers[i].Id==disponibles[j]){
+            NombreChofer=Drivers[i].Nombre;
+            PuntajeChofer=Drivers[i].Puntaje;
+            ColorAuto=Drivers[i].Color;
+            for (var k = 0; k < Positions.length; k++) {
+              if(Positions[k].IdDriver==Drivers[i].Id){
+                CoordenadaInicial=Positions[k].Recorrido[0];
+                switch(ColorAuto){
+                  case "red":
+                      var auto = L.marker(CoordenadaInicial, {icon: autoRojo});
+                      auto.bindPopup(NombreChofer + "  " + PuntajeChofer);
+                      auto.on('mouseover',function (e){ this.openPopup();});
+                      auto.on('mouseout',function (e){this.closePopup();});
+                      Markers[j]=auto;
+                  break;
+                  case "green":
+                      var auto = L.marker(CoordenadaInicial, {icon: autoVerde});
+                      auto.bindPopup(NombreChofer + "  " + PuntajeChofer);
+                      auto.on('mouseover',function (e){ this.openPopup();});
+                      auto.on('mouseout',function (e){this.closePopup();});
+                      Markers[j]=auto;
+                  break;
+                  case "gray":
+                      var auto = L.marker(CoordenadaInicial, {icon: autoGris});
+                      auto.bindPopup(NombreChofer + "  " + PuntajeChofer);
+                      auto.on('mouseover',function (e){ this.openPopup();});
+                      auto.on('mouseout',function (e){this.closePopup();});
+                      Markers[j]=auto;
+                  break;
+                  case "black":
+                      var auto = L.marker(CoordenadaInicial, {icon: autoNegro});
+                      auto.bindPopup(NombreChofer + "  " + PuntajeChofer);
+                      auto.on('mouseover',function (e){ this.openPopup();});
+                      auto.on('mouseout',function (e){this.closePopup();});
+                      Markers[j]=auto;
+                  break;
+                }
+              }
+            }
+          }
+        }
+      }
+      showCars = L.layerGroup(Markers);
+      showCars.addTo(map);
+    }
+
+    //-------------------------------------------------------------------------------------------------------- 
+    //--------------------------------------------------------------------------------------------------------
+
+}
+
+
+
+$(bootstrap);

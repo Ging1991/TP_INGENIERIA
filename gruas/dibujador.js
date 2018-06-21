@@ -5,13 +5,6 @@ var Dibujador = function() {
         dibujarEstados: dibujarEstados
     }
 
-    function dibujarGrua(grua, mapa) {
-    	var dato = grua.getEstado();
-		var punto = L.marker(L.latLng(grua.getLat(), grua.getLon()))
-			.bindPopup(dato);
-		punto.addTo(mapa);		
-	}
-
     function dibujarEstados(estados, ID) {  
 		estados.forEach(function(estado) {
             var li = $('<li>');
@@ -19,4 +12,14 @@ var Dibujador = function() {
             $("#"+ID).append(li);
         });
     }
+
+    function dibujarGrua(grua, mapa) {
+    	if (grua.layer != null) {
+			mapa.removeLayer(grua.layer);
+		}
+    	
+    	grua.layer = L.marker(L.latLng(grua.getLat(), grua.getLon()));
+    	grua.layer.bindPopup(grua.getEstado());
+		grua.layer.addTo(mapa);
+	}
 }
