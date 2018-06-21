@@ -5,14 +5,16 @@ var bootstrap = function() {
     var dibujador = new Dibujador();
     var estados = traerEstados();
     var gruas = traerGruas();
+    var depositos = traerDepositos();
     dibujador.dibujarEstados(estados, 'estados');
-    console.log("BLOQUE 1: INICIALIZACION TERMINADA");
+    console.log("BLOQUE 1: INICIALIZACION TERMINADO");
     
     
     // BLOQUE 2: CONFIGURAR GRUAS
     var agregarPosiciones = function (grua, estados){
     	grua.posiciones = traerPosiciones(grua.id);
     	grua.posiciones.forEach(function(posicion){
+    		posicion.estadoID = posicion.estado; 
        		posicion.estado = estados[posicion.estado].descripcion;
        	});   	
     };
@@ -28,6 +30,9 @@ var bootstrap = function() {
     };
 
     var agregarGetters = function(grua){
+    	grua.getEstadoID = function(){
+    		return grua.posiciones[grua.posicionActual].estadoID;
+    	};
     	grua.getLat = function(){
     		return grua.posiciones[grua.posicionActual].ubicacion.lat;
     	};
@@ -49,7 +54,7 @@ var bootstrap = function() {
     	delete grua.ubicacion;
     
     });
-    console.log("BLOQUE 2: CONFIGURAR GRUAS TERMINADA");
+    console.log("BLOQUE 2: CONFIGURAR GRUAS TERMINADO");
     
     // BLOQUE 3: CONFIGURAR DIBUJO
     var dibujarTodo = function() {
@@ -59,6 +64,10 @@ var bootstrap = function() {
 	    });
 	};
 
+	depositos.forEach(function(deposito){
+		dibujador.dibujarDeposito(deposito, mapa);
+	});
+	
     setInterval(dibujarTodo, 1000);
     console.log("BLOQUE 3: CONFIGURAR DIBUJO TERMINADO");
 };

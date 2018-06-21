@@ -27,6 +27,7 @@ var callSincronico = function (url, callback) {
 
 var urlEstados = Config.api + Config.estados;
 var urlGruas = Config.api + Config.gruas;
+var urlDepositos = Config.api + Config.depositos;
 var vacio = function(){};
 
 
@@ -42,8 +43,14 @@ var traerGruas = function() {
     return gruas;
 };
 
-var traerPosiciones = function(gruaID){
+var traerPosiciones = function(gruaID) {
 	var posiciones = callSincronico (urlGruas + gruaID + Config.posiciones, vacio);
 	posiciones = posiciones.posiciones;
 	return posiciones;
+};
+
+var traerDepositos = function() {
+	var depositos = callSincronico (urlDepositos, vacio);
+	depositos = depositos.depositos;
+	return depositos;
 };
