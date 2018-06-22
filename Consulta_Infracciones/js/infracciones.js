@@ -1,4 +1,3 @@
-
 var tipos_infraccion;
 var patente;
 /*
@@ -91,24 +90,24 @@ function bootstrapTablaInfracciones() {
 
  	str = $("#cuerpo_tabla").html();
 
- 	/*var acarreo = "NO";
+ 	
+	var acarreo = "NO";
 
  	if (infraccion.existeAcarreo) { 
- 		acarreo = "<a href='informacionAcarreo.html?id=" +
- 		infraccion.id + 
- 		"' target='_blank'>SI</a>";
- 	}*/
-
+ 		acarreo = "<a href='#'onclick='myJsFunc();'>SI</a>";
+ 	}
+	
+	
  	var t = 
  	$("#cuerpo_tabla").html( str +
  		"<tr>" +
  		"<td class='text-left'>" + infraccion.id + "</td>" +
-		"<td class='text-left'>" + infraccion.fechaHoraRegistro + "</td>" +
-		"<td class='text-left'>" + infraccion.fechaHoraActualizacion + "</td>" +
- 		"<td class='text-left'>" + infraccion.direccionRegistrada + "</td>" +
+		"<td class='text-left'>" + infraccion.direccionRegistrada + "</td>" +
  		"<td class='text-left'>" + buscaTipoInfraccion(infraccion.tipoInfraccion) + "</td>" +
  		"<td class='text-left'>" + infraccion.montoAPagar  + "</td>" +
- 		"<td class='text-left'>" + infraccion.existeAcarreo + " </td>" +
+		"<td class='text-left'>" + cambiarFecha(infraccion.fechaHoraRegistro) + "</td>" +
+		"<td class='text-left'>" + cambiarFecha(infraccion.fechaHoraActualizacion) + "</td>" +
+ 		"<td class='text-left'>" + acarreo + " </td>" +
  		"</tr>"
  		);
  }
@@ -125,4 +124,39 @@ function buscaTipoInfraccion(id) {
  	}
  	
 }
+function myJsFunc(){
+
+/*
+ * inicializa el mapa con todas las capas
+ */
+
+ // Ubicación de la UNGS.
+ var estacionLocation = [-34.543892, -58.713642];
+ 
+ var map = L.map("mapa_dep");
+
+ // Creación del componente mapa de Leaflet.
+ map.setView(estacionLocation, 15);
+
+ // Agregamos los Layers de OpenStreetMap.
+ var baseLayer = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+	 attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+ }).addTo(map);
+
+ // Agregamos el control para seleccionar Layers al mapa
+ var layersControl = L.control.layers({
+	 "Depositos": baseLayer
+ });
+ layersControl.addTo(map);
+
+
+
+
+}
+
+function cambiarFecha(fecha){
+ var res = fecha.substr(5,17);
+ var res2 = res.replace(/ /g, "-");
+ return res2;
+}	
 

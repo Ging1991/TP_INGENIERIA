@@ -2,8 +2,8 @@
 div.table-title {
   color: #4caf73;
   font-size: 24px;
-  padding:24px;
-  width: 100%;
+  padding:15px;
+  width: 90%;
   text-align: center;
 }
 
@@ -113,6 +113,11 @@ th.text-left {
 }
 td.text-left {
   text-align: left;
+}
+#mapa_dep{
+    
+  height: 100%;
+  width: 80%
 }
 
 

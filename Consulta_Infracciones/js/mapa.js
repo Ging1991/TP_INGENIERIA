@@ -1,4 +1,9 @@
 var map
+var myIcon = L.icon({
+	iconUrl: 'img/deposito.png', 
+	iconSize:[25,41],
+ 	iconAnchor:[12,41]
+});
 /*
  * inicializa el mapa con todas las capas
  */
@@ -43,7 +48,8 @@ function requestDepositos(){
 function agregarDepositos(datos){
 	for (var i=0; i<datos.depositos.length; i++) {
 		var p = L.marker(L.latLng(datos.depositos[i].ubicacion.lat,
-			datos.depositos[i].ubicacion.lon)).bindPopup(datos.depositos[i].nombre);
+			datos.depositos[i].ubicacion.lon),{icon: myIcon}).bindPopup(datos.depositos[i].nombre +"<br>"+ datos.depositos[i].direccion+
+			"<br>"+datos.depositos[i].telefono+"<br>"+datos.depositos[i].horarios);
 		p.addTo(map);
  	}
 	

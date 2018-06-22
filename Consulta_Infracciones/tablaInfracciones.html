@@ -2,6 +2,8 @@
 <head>
 	<link rel="stylesheet" href="css/table.css"></link>
 	<script src="./js/infracciones.js"></script>
+	<link rel="stylesheet" href="./js/leaflet/leaflet.css" />
+    <script src="./js/leaflet/leaflet.js"></script>
 </head>
 <body>
 	<div id="titulo_tabla" class="table-title">
@@ -15,11 +17,11 @@
 		<thead>
 			<tr>
 				<th class="text-left">ID</th>
-				<th class="text-left">Fecha y Hora de Registro</th>
-				<th class="text-left">Fecha y Hora de Actualizacion</th>
 				<th class="text-left">Direccion</th>
 				<th class="text-left">Tipo Infraccion</th>
 				<th class="text-left">Monto</th>
+				<th class="text-left">Fecha y Hora de Registro</th>
+				<th class="text-left">Fecha y Hora de Actualizacion</th>
 				<th class="text-left">Acarreo</th>
 			</tr>
 		</thead>
@@ -31,6 +33,8 @@
 	</table>
 
 	<div id="pie_tabla_infracciones">
+	</div>
+	<div id= "mapa_dep">
 	</div>
 
 </body>
