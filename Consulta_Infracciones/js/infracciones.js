@@ -44,7 +44,6 @@ function bootstrapTablaInfracciones() {
  */
  function requestTiposInfraccion() {
  	$.ajax({
- 		type: "GET",
  		url: "https://infraccionesya.herokuapp.com/api/tiposInfraccion",
  		contentType: "text/plain",
  		success: function (datos) {
@@ -60,12 +59,8 @@ function bootstrapTablaInfracciones() {
  * patente ingresado en el formulario
  */
  function requestInfracciones() {
-
- 	url = "https://infraccionesya.herokuapp.com/api/"+patente+"/infracciones/";
-
  	$.ajax({
- 		type: "GET",
- 		url: url,
+ 		url: "https://infraccionesya.herokuapp.com/api/"+patente+"/infracciones/",
  		contentType: "text/plain",
  		success: function (datos) { procesaInfracciones(datos);},
  		error: function() { alert('Error en la respuesta de InfraccionesYa.'); }
@@ -74,29 +69,43 @@ function bootstrapTablaInfracciones() {
  function procesaInfracciones(datos) {
 	 if (datos.infracciones.length == 0) {
  		$("#pie_tabla_infracciones").html("La patente solicitada no posee infracciones");
- 	}
-
+	 }
+	 
  	muestraPatente(datos.patente);
 
  	datos.infracciones.forEach(muestraInfraccion);
  }
+ /*
+ * hace la request al server de un acarreo segun la patente y el id de infraccion
+ */
+function requestAcarreo(id) {
+	$.ajax({
+		url: "https://infraccionesya.herokuapp.com/api/"+patente+"/acarreos/"+id,
+		contentType: "text/plain",
+		success: function (datos) {
+			mostrarMapaDep(datos);
+		},
+		error: function() { alert('Error en la respuesta de InfraccionesYa.'); }
+	});
+}
+
 
 /*
  * agrega la infraccion a la tabla 
  */
  function muestraInfraccion(infraccion, index) {
 
- 	if (typeof infraccion.id == 'undefined')  { return; }
+ 	if (typeof infraccion.id == 'undefined'){ 
+		 return; 
+	}
 
  	str = $("#cuerpo_tabla").html();
 
- 	
 	var acarreo = "NO";
 
  	if (infraccion.existeAcarreo) { 
- 		acarreo = "<a href='#'onclick='myJsFunc();'>SI</a>";
+ 		acarreo = "<a href='#'onclick='requestAcarreo("+infraccion.id+");'>SI</a>";
  	}
-	
 	
  	var t = 
  	$("#cuerpo_tabla").html( str +
@@ -124,33 +133,34 @@ function buscaTipoInfraccion(id) {
  	}
  	
 }
-function myJsFunc(){
+function mostrarMapaDep(datos){
+	
+	var latDep = datos.acarreo.deposito.ubicacion.lat;
+	var lonDep = datos.acarreo.deposito.ubicacion.lon;
 
-/*
- * inicializa el mapa con todas las capas
- */
-
- // Ubicación de la UNGS.
- var estacionLocation = [-34.543892, -58.713642];
+ // Ubicación de central del deposito
+ var location = [latDep, lonDep];
  
  var map = L.map("mapa_dep");
 
  // Creación del componente mapa de Leaflet.
- map.setView(estacionLocation, 15);
+ map.setView(location, 15);
 
  // Agregamos los Layers de OpenStreetMap.
  var baseLayer = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
 	 attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
  }).addTo(map);
 
- // Agregamos el control para seleccionar Layers al mapa
- var layersControl = L.control.layers({
-	 "Depositos": baseLayer
- });
- layersControl.addTo(map);
+ var myIcon = L.icon({
+	iconUrl: 'img/deposito.png', 
+	iconSize:[25,41],
+ 	iconAnchor:[12,41]
+});
 
-
-
+ var p = L.marker(L.latLng(latDep,
+	lonDep),{icon: myIcon}).bindPopup(datos.acarreo.deposito.nombre +"<br>"+ datos.acarreo.deposito.direccion+
+	"<br>"+datos.acarreo.deposito.telefono+"<br>"+datos.acarreo.deposito.horarios);
+p.addTo(map);
 
 }
 

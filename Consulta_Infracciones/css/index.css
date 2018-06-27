@@ -15,7 +15,6 @@ body {
 	margin-left: auto;
 }
 
-
 header{
 	display: flex;
 	
@@ -45,8 +44,7 @@ li.menu_item:hover {
 
 div#contenido{
 	display: flex;
-	
-	background: #c6cde0;
+	background: rgb(212, 211, 211);
 	list-style-type: none;
 	flex-grow: 1;
 	overflow: auto;

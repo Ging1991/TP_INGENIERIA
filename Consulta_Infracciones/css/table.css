@@ -1,30 +1,19 @@
 
-div.table-title {
-  color: #4caf73;
-  font-size: 24px;
+#titulo_tabla{
+  color: #ffffff;
+  font-size: 30px;
   padding:15px;
   width: 90%;
   text-align: center;
 }
 
-.table-title h3 {
-   color: #4caf73;
-   font-size: 24px;
-   font-style:normal;
-   font-family: "Roboto", helvetica, arial, sans-serif;
-   text-shadow: -1px -1px 1px rgba(0, 0, 0, 0.1);
-   text-transform:uppercase;
-}
 
-/*** Table Styles **/
 
 .table-fill {
   background: white;
   border-radius:3px;
   border-collapse: collapse;
-  /*height: 320px;*/
   margin: auto;
-  /*max-width: 600px;*/
   padding:5px;
   width: 70%;
   box-shadow: 0 5px 10px rgba(57, 228, 5, 0.1);
@@ -44,14 +33,7 @@ th {
   vertical-align:middle;
 }
 
-th:first-child {
-  border-top-left-radius:3px;
-}
- 
-th:last-child {
-  border-top-right-radius:3px;
-  border-right:none;
-}
+
   
 tr {
   border-top: 1px solid #C1C3D1;
@@ -69,29 +51,7 @@ tr:hover td {
   border-bottom: 1px solid #22262e;
 }
  
-tr:first-child {
-  border-top:none;
-}
 
-tr:last-child {
-  border-bottom:none;
-}
- 
-tr:nth-child(odd) td {
-  background:#EBEBEB;
-}
- 
-tr:nth-child(odd):hover td {
-  background:#4E5066;
-}
-
-tr:last-child td:first-child {
-  border-bottom-left-radius:3px;
-}
- 
-tr:last-child td:last-child {
-  border-bottom-right-radius:3px;
-}
  
 td {
   background:#FFFFFF;
@@ -104,20 +64,22 @@ td {
   border-right: 1px solid #C1C3D1;
 }
 
-td:last-child {
-  border-right: 0px;
+#pie_tabla_infracciones{
+  font-style: inherit;
+  font-size: 20px;
+
 }
 
-th.text-left {
-  text-align: left;
-}
-td.text-left {
-  text-align: left;
-}
 #mapa_dep{
-    
-  height: 100%;
-  width: 80%
+  position: relative;
+		top:10%;
+		left:50%;
+		width:700px;
+		margin-left:-350px;
+		height:300px;
+		padding:5px;
+  
+ 
 }
 
 
