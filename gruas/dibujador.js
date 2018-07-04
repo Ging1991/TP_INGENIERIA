@@ -1,6 +1,16 @@
+var getColor = function (color) {
+	if (color == 1)
+		return 'red';
+	
+	if(color== 2)
+		return 'yellow';
+	
+	return 'green';
+}
+
 var iconoDeposito = L.icon({
 	iconUrl:'imagenes/deposito.png',
-	iconSize:[25, 41],
+	iconSize:[50, 41],
 	iconAnchor:[12, 41]
 });
 
@@ -22,7 +32,7 @@ var iconoEnViaje = L.icon({
 	iconAnchor:[12, 41]
 });
 
-var iconos = [iconoDisponible, iconoNoDisponible, iconoEnViaje];
+var iconos = [iconoDisponible, iconoEnViaje, iconoNoDisponible];
 
 var Dibujador = function() {
     
@@ -32,12 +42,32 @@ var Dibujador = function() {
         dibujarDeposito:dibujarDeposito
     }
 
-    function dibujarEstados(estados, ID) {  
+    function dibujarEstados(mapa) {
+        var legend = L.control({position : 'bottomleft'});
+        legend.onAdd = function(map){
+        	var div = L.DomUtil.create('div', 'legend');
+        	var estados = ["No operativa", "En viaje", "Libre"];
+        	var colores = [1, 2, 0];
+        	div.innerHTML = '<div><b>Estados</b></div>';
+
+        	for(var i = 0; i < colores.length; i++){
+        		div.innerHTML += '<i style="background:' 
+        			+ getColor(colores[i]) + '">&nbsp;&nbsp;</i>&nbsp;&nbsp;'
+        			+ estados[i] + '<br />';
+    			}
+    			return div;
+    		}
+        
+    legend.addTo(mapa);
+
+    	
+    	/*
 		estados.forEach(function(estado) {
             var li = $('<li>');
             li.append(estado.descripcion);
             $("#"+ID).append(li);
         });
+        */
     }
 
     function dibujarGrua(grua, mapa) {

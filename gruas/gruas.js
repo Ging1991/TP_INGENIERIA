@@ -6,7 +6,8 @@ var bootstrap = function() {
     var estados = traerEstados();
     var gruas = traerGruas();
     var depositos = traerDepositos();
-    dibujador.dibujarEstados(estados, 'estados');
+    //dibujador.dibujarEstados(estados, 'estados');
+    dibujador.dibujarEstados(mapa);
     console.log("BLOQUE 1: INICIALIZACION TERMINADO");
     
     
@@ -70,6 +71,6 @@ var bootstrap = function() {
 	
     setInterval(dibujarTodo, 1000);
     console.log("BLOQUE 3: CONFIGURAR DIBUJO TERMINADO");
-};
+    };
 
 $(bootstrap);
